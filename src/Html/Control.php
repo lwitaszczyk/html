@@ -19,6 +19,11 @@ abstract class Control extends Tag implements Editable
     /**
      * @var bool
      */
+    private $checked;
+
+    /**
+     * @var bool
+     */
     private $readOnly;
 
     /**
@@ -40,14 +45,16 @@ abstract class Control extends Tag implements Editable
      * @param string $tag
      * @param string $name
      * @param mixed  $value
+     * @param bool $checked
      */
-    public function __construct($tag = null, $name = null, $value = null)
+    public function __construct($tag = null, $name = null, $value = null, $checked = false )
     {
-        parent::__construct($tag, null, false, true);
+        parent::__construct($tag, null, false);
         $this->addClass('control');
 
         $this->setName($name);
         $this->setValue($value);
+        $this->setChecked($checked);
 
         $this->tabIndex = null;
         $this->disabled = false;
@@ -141,6 +148,7 @@ abstract class Control extends Tag implements Editable
         $this->setAttribute('name', $this->getName());
         $this->setAttribute('value', $this->getValue());
         $this->setAttribute('placeholder', $this->getPlaceholder());
+        $this->setAttribute('checked', 'checked', $this->getChecked());
 
         return parent::build();
     }
@@ -179,5 +187,23 @@ abstract class Control extends Tag implements Editable
     {
         $this->value = $value;
         return $this;
+    }
+
+    /**
+     * @param bool $checked
+     * @return self
+     */
+    public function setChecked($checked)
+    {
+        $this->checked = $checked;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getChecked()
+    {
+        return $this->checked;
     }
 }
