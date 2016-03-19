@@ -1,0 +1,30 @@
+{
+    "name": "lwitaszczyk/html",
+    "type": "library",
+    "description": "Html",
+    "require": {
+        "php": ">=5.5.0",
+        "leafo/scssphp": "^0.6.3",
+        "mustache/mustache": "^2.9",
+        "twig/twig": "^1.24"
+    },
+    "authors": [
+        {
+            "name": "Lukasz Witaszczyk",
+            "email": "Lukasz.Witaszczyk@gmail.com"
+        }
+    ],
+    "require-dev": {
+        "phpspec/phpspec": "2.2.*",
+        "squizlabs/php_codesniffer": "^2.5",
+        "fabpot/php-cs-fixer": "^1.10"
+    },
+    "autoload": {
+        "psr-0": {
+            "": "src"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}
