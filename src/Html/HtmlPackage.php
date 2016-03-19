@@ -3,13 +3,13 @@
 namespace Html;
 
 use Blocks\Application;
-use Blocks\Package;
 use Blocks\DI\DIAsAlias;
 use Blocks\DI\DIAsSingleton;
-use Blocks\DI\DIAsValue;
+use Blocks\DI\DIByConfiguration;
 use Blocks\DI\DIByService;
 use Blocks\DI\DIByTags;
 use Blocks\DI\DIContainer;
+use Blocks\Package;
 use Html\Resource\Builder;
 use Html\Resource\CollectorJs;
 use Html\Resource\CollectorScss;
@@ -23,7 +23,6 @@ class HtmlPackage extends Package
     const RESOURCE_COLLECTOR_TAG = 'html-resource-collector';
     const RESOURCE_COLLECTOR_JS = 'html-resource-collector-js';
     const RESOURCE_COLLECTOR_TS = 'html-resource-collector-ts';
-    const RESOURCE_COLLECTOR_JS_OBFUSCATE = 'html-resource-collector-js-obfuscate';
     const RESOURCE_COLLECTOR_SCSS = 'html-resource-collector-scss';
 
     public function __construct(DIContainer $container)
@@ -35,10 +34,6 @@ class HtmlPackage extends Package
         ]);
 
         $container->add([
-            (new DIAsValue(self::RESOURCE_COLLECTOR_JS_OBFUSCATE, true)),
-        ]);
-
-        $container->add([
             (new DIAsSingleton(self::RESOURCE_FILE_NAME, Resources::class)),
         ]);
 
@@ -46,7 +41,7 @@ class HtmlPackage extends Package
             (new DIAsSingleton(self::RESOURCE_COLLECTOR_JS, CollectorJs::class))->addArguments([
                 new DIByService(self::RESOURCE_FILE_NAME),
                 new DIByService(self::RESOURCE_CACHE),
-                new DIByService(self::RESOURCE_COLLECTOR_JS_OBFUSCATE)
+                new DIByConfiguration('html.javascript.obfuscate', false)
             ])->addTag(self::RESOURCE_COLLECTOR_TAG),
         ]);
 
