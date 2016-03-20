@@ -2,7 +2,7 @@
 
 namespace Html;
 
-class Input extends Control
+abstract class Input extends Control
 {
     const T_TEXT = 'text';
     const T_PASSWORD = 'password';
@@ -25,10 +25,11 @@ class Input extends Control
      * @param string $type
      * @param string $name
      * @param mixed  $value
+     * @param bool $checked
      */
-    public function __construct($type = self::T_TEXT, $name = null, $value = null)
+    public function __construct($type = self::T_TEXT, $name = null, $value = null, $checked = false)
     {
-        parent::__construct('input', $name, $value);
+        parent::__construct('input', $name, $value, $checked);
         $this->setShortClosed(true);
         $this->setType($type);
     }
