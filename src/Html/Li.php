@@ -5,10 +5,10 @@ namespace Html;
 class Li extends Tag
 {
     /**
-     *
+     * @param string $content
      */
-    public function __construct()
+    public function __construct($content = '')
     {
-        parent::__construct('li');
+        parent::__construct('li', $content);
     }
 }
