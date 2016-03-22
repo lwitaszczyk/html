@@ -8,42 +8,52 @@ class Tag implements Item
 {
 
     protected static $JSAutoRun = false;
+
     /**
      * @var string
      */
     private $tag;
+
     /**
      * @var Item
      */
     private $parent;
+
     /**
      * @var Item[]
      */
     private $items;
+
     /**
      * @var string
      */
     private $content;
+
     /**
      * @var string
      */
     private $id;
+
     /**
      * @var string
      */
     private $style;
+
     /**
      * @var string[]
      */
     private $classes;
+
     /**
      * @var string[]
      */
     private $attributes;
+
     /**
      * @var bool
      */
     private $shortClosed;
+
     /**
      * @var Filter[]
      */
@@ -134,7 +144,7 @@ class Tag implements Item
     {
         if (!is_null($item)) {
             $this->items[] = $item;
-            $item->setParent($this);
+            $item->parent = $this;
             return $item;
         }
         return $this;
@@ -287,16 +297,6 @@ class Tag implements Item
         return $tag;
     }
 
-    private function renderHTMLAttributes()
-    {
-        $this->setAttribute('id', $this->id);
-        if (!empty($this->classes)) {
-            $classes = implode(' ', $this->classes);
-            $this->setAttribute('class', $classes, ($this->classes !== ''));
-        }
-        $this->setAttribute('style', $this->style, ($this->style !== ''));
-    }
-
     /**
      * @param $name
      * @param mixed|null $value
@@ -314,19 +314,14 @@ class Tag implements Item
         return $this;
     }
 
-    private function renderContent()
+    /**
+     * @param mixed $var
+     * @return self
+     */
+    public function assign(&$var)
     {
-        $content = $this->getContent();
-
-        foreach ($this->filters as $filter) {
-            $content = $filter->transform($content);
-        }
-
-        foreach ($this->items as $item) {
-            $content .= $item->render();
-        }
-
-        return $content;
+        $var = $this;
+        return $this;
     }
 
     /**
@@ -347,6 +342,28 @@ class Tag implements Item
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    private function renderContent()
+    {
+        $content = $this->getContent();
+
+        foreach ($this->filters as $filter) {
+            $content = $filter->transform($content);
+        }
+
+        foreach ($this->items as $item) {
+            $content .= $item->render();
+        }
+
+        return $content;
+    }
+
+    /**
+     * @param string $content
+     * @return string
+     */
     private function renderTag($content)
     {
         if (!is_null($this->tag)) {
@@ -363,22 +380,17 @@ class Tag implements Item
     }
 
     /**
-     * @param mixed $var
-     * @return self
-     */
-    public function assign(&$var)
-    {
-        $var = $this;
-        return $this;
-    }
-
-    /**
-     * @param Item $parent
      * @return $this
      */
-    private function setParent(Item $parent)
+    private function renderHTMLAttributes()
     {
-        $this->parent = $parent;
+        $this->setAttribute('id', $this->id);
+        if (!empty($this->classes)) {
+            $classes = implode(' ', $this->classes);
+            $this->setAttribute('class', $classes, ($this->classes !== ''));
+        }
+        $this->setAttribute('style', $this->style, ($this->style !== ''));
+
         return $this;
     }
 }
