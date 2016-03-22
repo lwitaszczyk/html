@@ -306,27 +306,26 @@ class Tag implements Item
     public function setAttribute($name, $value = null, $provided = true)
     {
         if ((!is_null($value)) && ($provided)) {
-            //        if ($provided) {
             $this->attributes[$name] = htmlentities($value);
         } else {
             unset($this->attributes[$name]);
         }
+
         return $this;
     }
 
     private function renderContent()
     {
-        $content = '';
-        if (empty($this->items)) {
-            $content = $this->getContent();
-            foreach ($this->filters as $filter) {
-                $content = $filter->transform($content);
-            }
-        } else {
-            foreach ($this->items as $item) {
-                $content .= $item->render();
-            }
+        $content = $this->getContent();
+
+        foreach ($this->filters as $filter) {
+            $content = $filter->transform($content);
         }
+
+        foreach ($this->items as $item) {
+            $content .= $item->render();
+        }
+
         return $content;
     }
 
