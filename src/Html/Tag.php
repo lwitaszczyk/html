@@ -315,16 +315,6 @@ class Tag implements Item
     }
 
     /**
-     * @param mixed $var
-     * @return self
-     */
-    public function assign(&$var)
-    {
-        $var = $this;
-        return $this;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getContent()
