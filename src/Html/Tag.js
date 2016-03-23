@@ -1,6 +1,3 @@
-
-/*development mode*/
-
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
@@ -11,10 +8,11 @@ window.requestAnimFrame = (function () {
 })();
 
 Function.prototype.inherit = function (parent, child) {
-    function wrapper() {
+    function Wrapper() {
     }
-    wrapper.prototype = parent.prototype;
-    this.prototype = new wrapper();
+
+    Wrapper.prototype = parent.prototype;
+    this.prototype = new Wrapper();
     $.extend(this.prototype, child);
 };
 
@@ -37,22 +35,10 @@ Html_Tag.prototype = {
         defVal = (!defVal) ? null : defVal;
         return (this.node.attr(name)) ? this.node.attr(name) : defVal;
     },
-    getAttrAsBool: function (name, defVal) {
-        defVal = (!defVal) ? false : true;
-        return ((this.node.attr(name)) ? parseInt(this.node.attr(name)) : defVal) ? true : false;
-    },
-    getAttrAsInt: function (name, defVal) {
-        var value = this.node.attr(name);
-        if (value) {
-            return parseInt(value);
-        } else {
-            return (defVal) ? defVal : null;
-        }
-    },
-    normKeyEvent: function (event) {
-        event = (!event) ? window.event : event;
-        event.keyCode = (!event.keyCode) ? event.charCode : event.keyCode;
-        event.keyCode = (!event.keyCode) ? event.which : event.keyCode;
-        return event;
+    /**
+     * @returns {jQuery}
+     */
+    getNode: function () {
+        return this.node;
     }
 };
