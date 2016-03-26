@@ -7,7 +7,7 @@ use Blocks\DI\DIAsAlias;
 use Blocks\DI\DIAsSingleton;
 use Blocks\DI\DIByConfiguration;
 use Blocks\DI\DIByService;
-use Blocks\DI\DIByTags;
+use Blocks\DI\DIByTag;
 use Blocks\DI\DIContainer;
 use Blocks\Package;
 use Html\Resource\Builder;
@@ -54,7 +54,7 @@ class HtmlPackage extends Package
 
         $container->add([
             (new DIAsSingleton(self::RESOURCE_BUILDER, Builder::class))->addArguments([
-                new DIByTags(self::RESOURCE_COLLECTOR_TAG),
+                new DIByTag(self::RESOURCE_COLLECTOR_TAG),
             ]),
         ]);
     }
