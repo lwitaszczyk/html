@@ -44,15 +44,23 @@ class CollectorJs implements Collector
     private $runScript;
 
     /**
+     * @var string
+     */
+    private $region;
+
+    /**
+     * CollectorJs constructor.
      * @param Resources $resourceFileName
      * @param Cache $cache
      * @param bool|true $obfuscate
+     * @param string $region
      */
-    public function __construct(Resources $resourceFileName, Cache $cache, $obfuscate = true)
+    public function __construct(Resources $resourceFileName, Cache $cache, $obfuscate = true, $region = '')
     {
         $this->resourceFileName = $resourceFileName;
         $this->cache = $cache;
         $this->obfuscate = (bool)$obfuscate;
+        $this->region = $region;
 
         $this->extension = 'js';
         $this->resources = [];
@@ -85,6 +93,24 @@ class CollectorJs implements Collector
         }
 
         return $this->generateFullScript();
+    }
+
+    /**
+     * @return string
+     */
+    public function getRegion()
+    {
+        return $this->region;
+    }
+
+    /**
+     * @param string $region
+     * @return $this
+     */
+    public function setRegion($region)
+    {
+        $this->region = $region;
+        return $this;
     }
 
     /**
@@ -138,7 +164,7 @@ class CollectorJs implements Collector
                 foreach ($mapItem->getInstances() as $instance) {
                     if ($instance::isJSAutoRun()) {
                         $instance->addClass($jsRunClass);
-                        $this->runScript[$jsRunClass] = sprintf('  $(".%1$s").each(function() {new %1$s(this)});', $jsRunClass) . "\n";
+                        $this->runScript[$jsRunClass] = sprintf('  $("%1$s .%2$s").each(function() {new %2$s(this)});', $this->region, $jsRunClass) . "\n";
                     }
                 }
 //            }
