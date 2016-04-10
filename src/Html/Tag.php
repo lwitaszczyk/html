@@ -315,6 +315,25 @@ class Tag implements Item
     }
 
     /**
+     * @param $name
+     * @param null $value
+     * @return Tag
+     */
+    public function setDataAttribute($name, $value = null) {
+        return $this->setAttribute("data-$name", $value);
+    }
+
+    /**
+     * @param $name
+     * @param null $default
+     * @return mixed|null
+     */
+    public function getDataAttribute($name, $default = null)
+    {
+        return $this->getAttribute("data-$name", $default);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getContent()
