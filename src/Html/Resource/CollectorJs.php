@@ -3,6 +3,9 @@
 namespace Html\Resource;
 
 use Blocks\Cache;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\Reader;
+use Html\Annotation\Runnable;
 use JavaScriptPacker;
 
 class CollectorJs implements Collector
@@ -49,13 +52,25 @@ class CollectorJs implements Collector
     private $region;
 
     /**
+     * @var AnnotationReader
+     */
+    private $annotationReader;
+
+    /**
      * CollectorJs constructor.
      * @param Resources $resourceFileName
      * @param Cache $cache
-     * @param bool|true $obfuscate
+     * @param Reader $annotationReader
+     * @param bool $obfuscate
      * @param string $region
      */
-    public function __construct(Resources $resourceFileName, Cache $cache, $obfuscate = true, $region = '')
+    public function __construct(
+        Resources $resourceFileName,
+        Cache $cache,
+        Reader $annotationReader,
+        $obfuscate = true,
+        $region = ''
+    )
     {
         $this->resourceFileName = $resourceFileName;
         $this->cache = $cache;
@@ -65,6 +80,8 @@ class CollectorJs implements Collector
         $this->extension = 'js';
         $this->resources = [];
         $this->type = 'js';
+
+        $this->annotationReader = $annotationReader;
     }
 
     /**
@@ -96,21 +113,44 @@ class CollectorJs implements Collector
     }
 
     /**
-     * @return string
+     * @param string $className
+     * @return self
      */
-    public function getRegion()
+    private function addResource($className)
     {
-        return $this->region;
+        if (!isset($this->resources[$className])) {
+            $fileName = $this->resourceFileName->getResourceFileName($className, $this->extension);
+            if (file_exists($fileName)) {
+                $this->resources[$className] = file_get_contents($fileName) . "\n";
+            } else {
+                $this->resources[$className] = '';
+            }
+        }
+
+        return $this;
     }
 
     /**
-     * @param string $region
-     * @return $this
+     * @param MapItem $mapItem
+     * @param string $className
      */
-    public function setRegion($region)
+    private function updateInstances(MapItem $mapItem, $className)
     {
-        $this->region = $region;
-        return $this;
+        if (!is_null($className)) {
+
+            $jsRunClass = str_replace('\\', '_', $className);
+
+            $runnableAnnotation = $this->annotationReader->getClassAnnotation(
+                new \ReflectionClass($className), Runnable::class
+            );
+
+            if ($runnableAnnotation instanceof Runnable) {
+                foreach ($mapItem->getInstances() as $instance) {
+                    $instance->addClass($jsRunClass);
+                    $this->runScript[$jsRunClass] = sprintf('  $("%1$s .%2$s").each(function() {new %2$s(this)});', $this->region, $jsRunClass) . "\n";
+                }
+            }
+        }
     }
 
     /**
@@ -145,55 +185,20 @@ class CollectorJs implements Collector
     }
 
     /**
-     * @param MapItem $mapItem
-     * @param string $className
+     * @return string
      */
-    private function updateInstances(MapItem $mapItem, $className)
+    public function getRegion()
     {
-        if (!is_null($className)) {
-            $jsRunClass = str_replace('\\', '_', $className);
-
-//            $reflectionClass = new \ReflectionClass($className);
-//            $doc = $reflectionClass->getDocComment();
-//            if (strpos($doc, '@HTML/Runnable') !== false) {
-//                foreach ($mapItem->getInstances() as $instance) {
-//                    $instance->addClass($jsRunClass);
-//                    $this->runScript[$jsRunClass] = sprintf('  $(".%1$s").each(function() {new %1$s(this)});', $jsRunClass) . "\n";
-//                }
-//            } else {
-                foreach ($mapItem->getInstances() as $instance) {
-                    if ($instance::isJSAutoRun()) {
-                        $instance->addClass($jsRunClass);
-                        $this->runScript[$jsRunClass] = sprintf('  $("%1$s .%2$s").each(function() {new %2$s(this)});', $this->region, $jsRunClass) . "\n";
-                    }
-                }
-//            }
-
-//this code get param with value from annotations
-//            $reflectionClass = new \ReflectionClass($className);
-//            $doc = $reflectionClass->getDocComment();
-//            preg_match_all('#@HTML\/Runnable(.*?)\n#s', $doc, $annotations);
-//            if (!empty($annotations[1])) {
-//                var_dump($annotations);
-//            }
-        }
+        return $this->region;
     }
 
     /**
-     * @param string $className
-     * @return self
+     * @param string $region
+     * @return $this
      */
-    private function addResource($className)
+    public function setRegion($region)
     {
-        if (!isset($this->resources[$className])) {
-            $fileName = $this->resourceFileName->getResourceFileName($className, $this->extension);
-            if (file_exists($fileName)) {
-                $this->resources[$className] = file_get_contents($fileName) . "\n";
-            } else {
-                $this->resources[$className] = '';
-            }
-        }
-
+        $this->region = $region;
         return $this;
     }
 }

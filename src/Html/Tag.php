@@ -7,8 +7,6 @@ use Html\Filter\Filter;
 class Tag implements Item
 {
 
-    protected static $JSAutoRun = false;
-
     /**
      * @var string
      */
@@ -88,11 +86,6 @@ class Tag implements Item
     {
         $this->shortClosed = $shortClosed;
         return $this;
-    }
-
-    public static function isJSAutoRun()
-    {
-        return static::$JSAutoRun;
     }
 
     /**

@@ -25,34 +25,39 @@ class HtmlPackage extends Package
     const RESOURCE_COLLECTOR_TS = 'html-resource-collector-ts';
     const RESOURCE_COLLECTOR_SCSS = 'html-resource-collector-scss';
 
+    /**
+     * HtmlPackage constructor.
+     * @param DIContainer $container
+     */
     public function __construct(DIContainer $container)
     {
         parent::__construct();
 
-        $container->add([
+        $container->addServices([
             (new DIAsAlias(self::RESOURCE_CACHE, Application::CACHE)),
         ]);
 
-        $container->add([
+        $container->addServices([
             (new DIAsSingleton(self::RESOURCE_FILE_NAME, Resources::class)),
         ]);
 
-        $container->add([
+        $container->addServices([
             (new DIAsSingleton(self::RESOURCE_COLLECTOR_JS, CollectorJs::class))->addArguments([
                 new DIByService(self::RESOURCE_FILE_NAME),
                 new DIByService(self::RESOURCE_CACHE),
+                new DIByService(Application::ANNOTATIONS_READER),
                 new DIByConfiguration('html.javascript.obfuscate', false)
             ])->addTag(self::RESOURCE_COLLECTOR_TAG),
         ]);
 
-        $container->add([
+        $container->addServices([
             (new DIAsSingleton(self::RESOURCE_COLLECTOR_SCSS, CollectorScss::class))->addArguments([
                 new DIByService(self::RESOURCE_FILE_NAME),
                 new DIByService(self::RESOURCE_CACHE),
             ])->addTag(self::RESOURCE_COLLECTOR_TAG),
         ]);
 
-        $container->add([
+        $container->addServices([
             (new DIAsSingleton(self::RESOURCE_BUILDER, Builder::class))->addArguments([
                 new DIByTag(self::RESOURCE_COLLECTOR_TAG),
             ]),
