@@ -312,7 +312,8 @@ class Tag implements Item
      * @param null $value
      * @return Tag
      */
-    public function setDataAttribute($name, $value = null) {
+    public function setDataAttribute($name, $value = null)
+    {
         return $this->setAttribute("data-$name", $value);
     }
 

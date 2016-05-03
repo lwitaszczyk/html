@@ -70,8 +70,7 @@ class CollectorJs implements Collector
         Reader $annotationReader,
         $obfuscate = true,
         $region = ''
-    )
-    {
+    ) {
         $this->resourceFileName = $resourceFileName;
         $this->cache = $cache;
         $this->obfuscate = (bool)$obfuscate;
@@ -137,7 +136,6 @@ class CollectorJs implements Collector
     private function updateInstances(MapItem $mapItem, $className)
     {
         if (!is_null($className)) {
-
             $jsRunClass = str_replace('\\', '_', $className);
 
             $runnableAnnotation = $this->annotationReader->getClassAnnotation(

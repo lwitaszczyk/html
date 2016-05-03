@@ -4,7 +4,7 @@ namespace spec\Html;
 
 use PhpSpec\ObjectBehavior;
 
-class H5Spec extends ObjectBehavior
+class H6Spec extends ObjectBehavior
 {
     public function it_is_initializable()
     {

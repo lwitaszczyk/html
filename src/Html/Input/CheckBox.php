@@ -23,6 +23,5 @@ class CheckBox extends Input
     {
         parent::build();
         $this->setAttribute('checked', 'checked', $this->getValue());
-
     }
 }

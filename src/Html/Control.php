@@ -47,7 +47,7 @@ abstract class Control extends Tag implements Editable
      * @param mixed  $value
      * @param bool $checked
      */
-    public function __construct($tag = null, $name = null, $value = null, $checked = false )
+    public function __construct($tag = null, $name = null, $value = null, $checked = false)
     {
         parent::__construct($tag, null, false);
         $this->addClass('control');
