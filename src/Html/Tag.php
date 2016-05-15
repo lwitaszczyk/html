@@ -242,6 +242,14 @@ class Tag implements Item
     }
 
     /**
+     * @param string $class
+     * @return bool
+     */
+    public function hasClass($class) {
+        return isset($this->classes[$class]);
+    }
+
+    /**
      * @param string $name
      * @param mixed|null $default
      * @return mixed|null
