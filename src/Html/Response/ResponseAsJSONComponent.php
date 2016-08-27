@@ -2,8 +2,9 @@
 
 namespace Html\Response;
 
+use Blocks\Http\HttpApplication;
 use Blocks\Http\Response;
-use Blocks\Application;
+use Html\Resource\Builder;
 use Html\Tag;
 
 class ResponseAsJSONComponent extends Response
@@ -35,8 +36,7 @@ class ResponseAsJSONComponent extends Response
     public function getContent()
     {
         if (is_null($this->renderedContent)) {
-            $builder = Application::getInstance()->getContainer()->get('html-resource-builder');
-
+            $builder = HttpApplication::getInstance()->getContainer()->get(Builder::class);
 
             $this->tag->build();
             $builder->build($this->tag);

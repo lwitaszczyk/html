@@ -2,15 +2,15 @@
 
 namespace Html\Response;
 
+use Blocks\Http\HttpApplication;
 use Blocks\Http\Response;
-use Blocks\Application;
 use Html\Html;
+use Html\Resource\Builder;
 use Html\Script;
 use Html\Style;
 
 class ResponseAsDocument extends Response
 {
-
     /**
      * @var string
      */
@@ -37,11 +37,24 @@ class ResponseAsDocument extends Response
      */
     public function getContent()
     {
-        if (is_null($this->renderedContent)) {
-            $builder = Application::getInstance()->getContainer()->get('html-resource-builder');
+//        if (is_null($this->renderedContent)) {
+
+            /**
+             * @var Builder $builder
+             */
+            $builder = HttpApplication::getInstance()->getContainer()->get(Builder::class);
 
             $this->html->build();
             $builder->build($this->html);
+
+            foreach ($builder->getRequiredDependencies() as $requiredDependency) {
+                $this->html->getHead()->add(
+                    $requiredDependency->getHeadDependencies()
+                );
+                $this->html->add(
+                    $requiredDependency->getBodyDependencies()
+                );
+            }
 
             $this->html->getHead()->add([
                 (new Style())->setContent($builder->getResource('css')),
@@ -53,7 +66,7 @@ class ResponseAsDocument extends Response
             $this->renderedContent = $this->html->render();
 
             $this->setContent($this->renderedContent);
-        }
+//        }
 
         return $this->renderedContent;
     }
