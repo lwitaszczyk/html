@@ -4,7 +4,6 @@ namespace Html;
 
 interface Item
 {
-    
     /**
      * @param Item $item
      * @return $this
@@ -31,20 +30,4 @@ interface Item
      * @return string
      */
     public function render();
-    
-    /**
-     * @param string $content
-     * @return $this
-     */
-    public function setContent($content = null);
-
-    /**
-     * @return string
-     */
-    public function getContent();
-    
-    /**
-     * @return Item
-     */
-    public function getParent();
 }

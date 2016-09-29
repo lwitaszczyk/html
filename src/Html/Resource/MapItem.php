@@ -72,4 +72,12 @@ final class MapItem
     {
         return $this->instances;
     }
+
+    /**
+     * @return Tag
+     */
+    public function getFirstInstance()
+    {
+        return reset($this->instances);
+    }
 }

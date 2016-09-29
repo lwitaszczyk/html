@@ -13,11 +13,6 @@ class Tag implements Item
     private $tag;
 
     /**
-     * @var Item
-     */
-    private $parent;
-
-    /**
      * @var Item[]
      */
     private $items;
@@ -58,6 +53,11 @@ class Tag implements Item
     private $filters;
 
     /**
+     * @var string[]
+     */
+    private $requiredDependencies;
+
+    /**
      * @param string $tag
      * @param string $content
      * @param bool $shortClosed
@@ -65,9 +65,10 @@ class Tag implements Item
     public function __construct($tag = null, $content = '', $shortClosed = false)
     {
         $this->content = $content;
-        $this->parent = null;
         $this->items = [];
         $this->filters = [];
+
+        $this->requiredDependencies = [];
 
         $this->setTag($tag);
         $this->setShortClosed($shortClosed);
@@ -76,6 +77,22 @@ class Tag implements Item
         $this->style = '';
         $this->classes = [];
         $this->attributes = [];
+    }
+
+    /**
+     * @param string $name
+     */
+    protected function requireDependency($name)
+    {
+        $this->requiredDependencies[$name] = (string)$name;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRequiredDependencies()
+    {
+        return $this->requiredDependencies;
     }
 
     /**
@@ -113,14 +130,6 @@ class Tag implements Item
     /**
      * {@inheritDoc}
      */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function add(array $items = [])
     {
         foreach ($items as $item) {
@@ -137,7 +146,6 @@ class Tag implements Item
     {
         if (!is_null($item)) {
             $this->items[] = $item;
-            $item->parent = $this;
             return $item;
         }
         return $this;
@@ -245,18 +253,9 @@ class Tag implements Item
      * @param string $class
      * @return bool
      */
-    public function hasClass($class) {
-        return isset($this->classes[$class]);
-    }
-
-    /**
-     * @param string $name
-     * @param mixed|null $default
-     * @return mixed|null
-     */
-    public function getAttribute($name, $default = null)
+    public function hasClass($class)
     {
-        return (isset($this->attributes[$name]) ? $this->attributes[$name] : $default);
+        return isset($this->classes[$class]);
     }
 
     /**
@@ -269,7 +268,7 @@ class Tag implements Item
     }
 
     /**
-     * @return self
+     * @return $this
      */
     public function build()
     {
@@ -299,6 +298,21 @@ class Tag implements Item
     }
 
     /**
+     * @return $this
+     */
+    private function renderHTMLAttributes()
+    {
+        $this->setAttribute('id', $this->id);
+        if (!empty($this->classes)) {
+            $classes = implode(' ', $this->classes);
+            $this->setAttribute('class', $classes, ($this->classes !== ''));
+        }
+        $this->setAttribute('style', $this->style, ($this->style !== ''));
+
+        return $this;
+    }
+
+    /**
      * @param $name
      * @param mixed|null $value
      * @param bool $provided set attribute is true (default)
@@ -312,44 +326,6 @@ class Tag implements Item
             unset($this->attributes[$name]);
         }
 
-        return $this;
-    }
-
-    /**
-     * @param $name
-     * @param null $value
-     * @return Tag
-     */
-    public function setDataAttribute($name, $value = null)
-    {
-        return $this->setAttribute("data-$name", $value);
-    }
-
-    /**
-     * @param $name
-     * @param null $default
-     * @return mixed|null
-     */
-    public function getDataAttribute($name, $default = null)
-    {
-        return $this->getAttribute("data-$name", $default);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getContent()
-    {
-        $content = is_null($this->content) ? '' : $this->content;
-        return $content;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setContent($content = null)
-    {
-        $this->content = (string)$content;
         return $this;
     }
 
@@ -372,6 +348,24 @@ class Tag implements Item
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function getContent()
+    {
+        $content = is_null($this->content) ? '' : $this->content;
+        return $content;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setContent($content = null)
+    {
+        $this->content = (string)$content;
+        return $this;
+    }
+
+    /**
      * @param string $content
      * @return string
      */
@@ -391,17 +385,35 @@ class Tag implements Item
     }
 
     /**
-     * @return $this
+     * @param $name
+     * @param null|string $value
+     * @return Tag
      */
-    private function renderHTMLAttributes()
+    public function setDataAttribute($name, $value = null)
     {
-        $this->setAttribute('id', $this->id);
-        if (!empty($this->classes)) {
-            $classes = implode(' ', $this->classes);
-            $this->setAttribute('class', $classes, ($this->classes !== ''));
-        }
-        $this->setAttribute('style', $this->style, ($this->style !== ''));
+        $name = (string)$name;
+        $value = (string)$value;
 
-        return $this;
+        return $this->setAttribute("data-$name", $value);
+    }
+
+    /**
+     * @param $name
+     * @param null $default
+     * @return mixed|null
+     */
+    public function getDataAttribute($name, $default = null)
+    {
+        return $this->getAttribute("data-$name", $default);
+    }
+
+    /**
+     * @param string $name
+     * @param mixed|null $default
+     * @return mixed|null
+     */
+    public function getAttribute($name, $default = null)
+    {
+        return (isset($this->attributes[$name]) ? $this->attributes[$name] : $default);
     }
 }

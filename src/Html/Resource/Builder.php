@@ -2,6 +2,8 @@
 
 namespace Html\Resource;
 
+use Html\Dependency\Dependency;
+use Html\Dependency\DependencyRegistry;
 use Html\Item;
 
 class Builder
@@ -22,12 +24,28 @@ class Builder
     private $collectors;
 
     /**
-     * @param Collector[] $collectors
+     * @var DependencyRegistry
      */
-    public function __construct(array $collectors = [])
-    {
+    private $dependencyRegistry;
+
+    /**
+     * @var Dependency[]
+     */
+    private $requiredDependencies;
+
+    /**
+     * Builder constructor.
+     * @param Collector[] $collectors
+     * @param DependencyRegistry $dependencyRegistry
+     */
+    public function __construct(
+        array $collectors = [],
+        DependencyRegistry $dependencyRegistry
+    ) {
         $this->resources = [];
         $this->collectors = $collectors;
+        $this->dependencyRegistry = $dependencyRegistry;
+        $this->requiredDependencies = [];
     }
 
     /**
@@ -49,8 +67,27 @@ class Builder
         $this->resources = [];
         $this->buildMap($item);
         $this->buildResources();
-        
+
+        foreach ($this->mapItems as $mapItem)
+        {
+            $tag = $mapItem->getFirstInstance();
+            $requiredDependencies = $tag->getRequiredDependencies();
+            foreach ($requiredDependencies as $requiredDependency) {
+                $this->requiredDependencies[$requiredDependency] =
+                    $this->dependencyRegistry->getByName($requiredDependency);
+            }
+        }
+        $this->requiredDependencies = array_reverse($this->requiredDependencies);
+
         return $this;
+    }
+
+    /**
+     * @return Dependency[]
+     */
+    public function getRequiredDependencies()
+    {
+        return $this->requiredDependencies;
     }
 
     /**
